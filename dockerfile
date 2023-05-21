@@ -1,9 +1,11 @@
-FROM node:18.14.2
+FROM node:18
 
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
 
 COPY . .
 
-RUN yarn install --network-timeout 1000000
+EXPOSE 3000
 
-CMD ["yarn", "start"]
+CMD ["npm", "start"]

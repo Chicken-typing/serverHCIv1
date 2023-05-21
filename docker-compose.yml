@@ -1,7 +1,0 @@
-version: "3.8"
-services:
-  app:
-    image: nguyenkhang244/dklstore_server:lastest
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
