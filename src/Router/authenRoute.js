@@ -1,5 +1,5 @@
 import express from "express";
-import { isAuthenticated } from "../utils.js";
+import isAuthenticated from "../utils/isAuthenticated.js";
 import expressAsyncHandler from "express-async-handler";
 const authenRoute = express.Router();
 authenRoute.get("/", isAuthenticated, expressAsyncHandler(async(req, res)=> {
