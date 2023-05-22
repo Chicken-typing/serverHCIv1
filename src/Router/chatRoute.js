@@ -1,6 +1,6 @@
 import express from "express";
 import Chat from "../models/chatModel.js";
-import { isAuthenticated } from "../utils.js";
+import isAuthenticated from "../utils/isAuthenticated.js";
 const chatRoute = express.Router();
 chatRoute.get("/:roomId", isAuthenticated, (req, res) => {
   Chat.findOne({ roomId: req.params.roomId }, (err, room) => {

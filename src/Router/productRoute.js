@@ -1,7 +1,8 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import Product from "../models/productModel.js";
-import { isAdmin, isAuthenticated } from "../utils.js";
+import isAdmin from "../utils/isAdmin.js";
+import isAuthenticated from "../utils/isAuthenticated.js";
 
 const productRoute = express.Router();
 
