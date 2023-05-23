@@ -5,7 +5,7 @@ import OTP from "../models/otpModel.js";
 import generateOTP from "../utils/generateOTP.js";
 import sendOTP from "../utils/sendOTP.js";
 const resetRoute = express.Router();
-resetRoute.get(
+resetRoute.post(
   "/",
   expressAsyncHandler(async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
@@ -31,7 +31,7 @@ resetRoute.get(
     }
   })
 );
-resetRoute.get(
+resetRoute.post(
   "/validate-code",
   expressAsyncHandler(async (req, res) => {
     const account = await OTP.findOne({ email: req.body.email });
