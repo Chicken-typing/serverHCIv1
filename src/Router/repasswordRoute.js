@@ -52,7 +52,7 @@ resetRoute.put(
   "/reset-password",
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.body.user_id);
-    user.password = req.body.password;
+    user.password = bcrypt.hashSync(req.body.password);
     await user.save();
     res.status(200).send({ message: "Password Reset Successfully." });
     await OTP.findOneAndRemove({ user_id: user._id });
