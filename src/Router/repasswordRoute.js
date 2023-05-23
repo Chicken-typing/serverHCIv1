@@ -4,6 +4,7 @@ import User from "../models/userModel.js";
 import OTP from "../models/otpModel.js";
 import generateOTP from "../utils/generateOTP.js";
 import sendOTP from "../utils/sendOTP.js";
+import bcrypt from "bcryptjs";
 const resetRoute = express.Router();
 resetRoute.post(
   "/",
