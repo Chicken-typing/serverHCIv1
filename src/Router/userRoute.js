@@ -2,7 +2,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import expressAsyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
-import isAdmin from "../utils/isAdmin.js"
+import isAdmin from "../utils/isAdmin.js";
 import isAuthenticated from "../utils/isAuthenticated.js";
 import isMasterAdmin from "../utils/isMasterAdmin.js";
 import generateToken from "../utils/generateToken.js";
@@ -94,7 +94,7 @@ userRoute.post(
 userRoute.post(
   "/signup",
   expressAsyncHandler(async (req, res) => {
-    const newUser = await User.findOne({email:req.body.email})
+    const newUser = await User.findOne({ email: req.body.email });
     if (!newUser) {
       const user = new User({
         username: req.body.username,
@@ -143,7 +143,7 @@ userRoute.put(
         password: updatedUser.password,
         address: updatedUser.address,
         phone: updatedUser.phone,
-        token: generateToken(updatedUser)
+        token: generateToken(updatedUser),
       });
     } else {
       res.status(404).send({ message: "User not found" });
@@ -156,22 +156,12 @@ userRoute.put(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.body._id);
-    if (user && user.role!=='masteradmin') {
+    if (user && user.role !== "masteradmin") {
       user.isActive = req.body.isActive;
-      // if (req.body.password) {
-      //   user.password = bcrypt.hashSync(req.body.password, 8);
-      // } else {
-      //   user.password = user.password;
-      // }
+      user.role = req.body.role;
       const updatedUser = await user.save();
       res.send({
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        avatar: updatedUser.avatar,
-        birthday: updatedUser.birthday,
-        address: updatedUser.address,
-        phone: updatedUser.phone,
+        role: updatedUser.role,
         isActive: updatedUser.isActive,
         token: generateToken(updatedUser),
       });
