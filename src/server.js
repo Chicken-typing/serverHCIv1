@@ -6,7 +6,6 @@ import userRoute from "./Router/userRoute.js";
 import orderRoute from "./Router/orderRoute.js";
 import chatRoute from "./Router/chatRoute.js";
 import cors from "cors";
-import { Server } from "socket.io";
 import authenRoute from "./Router/authenRoute.js";
 import resetRoute from "./Router/repasswordRoute.js";
 dotenv.config();
