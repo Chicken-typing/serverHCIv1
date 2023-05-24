@@ -1,12 +1,9 @@
 import express from "express";
-import data from "./data.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import seedRoute from "./Router/seedRoute.js";
 import productRoute from "./Router/productRoute.js";
 import userRoute from "./Router/userRoute.js";
 import orderRoute from "./Router/orderRoute.js";
-import uploadRoute from "./Router/uploadRoute.js";
 import chatRoute from "./Router/chatRoute.js";
 import cors from "cors";
 import { Server } from "socket.io";
@@ -14,6 +11,7 @@ import { addUser, getUser, getUsersInRoom, removeUser } from "./user.js";
 import Chat from "./models/chatModel.js";
 import { Db } from "mongodb";
 import authenRoute from "./Router/authenRoute.js";
+import resetRoute from "./Router/repasswordRoute.js";
 dotenv.config();
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -33,17 +31,15 @@ app.use(express.json({ limit: "50mb" }));
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/seed", seedRoute);
 app.use("/api/products", productRoute);
 app.use("/api/users", userRoute);
 app.use("/api/orders", orderRoute);
-app.use("/api/upload", uploadRoute);
 app.use("/api/room", chatRoute);
 app.use("/vtoken", authenRoute);
+app.use("/forgot",resetRoute)
 app.get("/api/keys/paypal", (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID || "sb");
 });
-
 app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });
 });

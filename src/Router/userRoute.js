@@ -1,13 +1,11 @@
-import express, { response } from "express";
+import express from "express";
 import bcrypt from "bcryptjs";
 import expressAsyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
-import {
-  isAuthenticated,
-  isAdmin,
-  generateToken,
-  isMasterAdmin,
-} from "../utils.js";
+import isAdmin from "../utils/isAdmin.js";
+import isAuthenticated from "../utils/isAuthenticated.js";
+import isMasterAdmin from "../utils/isMasterAdmin.js";
+import generateToken from "../utils/generateToken.js";
 
 const userRoute = express.Router();
 
@@ -29,8 +27,7 @@ userRoute.post(
     const newUser = new User({
       username: req.body.username,
       email: req.body.email,
-      // avatar: req.body.avatar,
-      birthday: req.body.birthday,
+      avatar: req.body.avatar,
       address: req.body.address,
       phone: req.body.phone,
       role: "admin",
@@ -42,7 +39,6 @@ userRoute.post(
       _id: user._id,
       username: user.username,
       email: user.email,
-      birthday: user.birthday,
       address: user.address,
       phone: user.phone,
       role: "admin",
@@ -82,7 +78,6 @@ userRoute.post(
           username: user.username,
           email: user.email,
           role: user.role,
-          birthday: user.birthday,
           phone: user.phone,
           address: user.address,
           isActive: user.isActive,
@@ -99,26 +94,30 @@ userRoute.post(
 userRoute.post(
   "/signup",
   expressAsyncHandler(async (req, res) => {
-    const newUser = new User({
-      username: req.body.username,
-      email: req.body.email,
-      avatar: req.body.avatar,
-      birthday: req.body.birthday,
-      address: req.body.address,
-      phone: req.body.phone,
-      role: "customer",
-      isActive: true,
-      password: bcrypt.hashSync(req.body.password),
-    });
-    const user = await newUser.save();
-    res.send({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      role: "customer",
-      isActive: true,
-      token: generateToken(user),
-    });
+    const newUser = await User.findOne({ email: req.body.email });
+    if (!newUser) {
+      const user = new User({
+        username: req.body.username,
+        email: req.body.email,
+        avatar: req.body.avatar,
+        address: req.body.address,
+        phone: req.body.phone,
+        role: "customer",
+        isActive: true,
+        password: bcrypt.hashSync(req.body.password),
+      });
+      await user.save();
+      res.status(200).send({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: "customer",
+        isActive: true,
+        token: generateToken(user),
+      });
+    } else {
+      res.status(404).send({ message: "This email has been used." });
+    }
   })
 );
 
@@ -132,7 +131,6 @@ userRoute.put(
       user.email = req.body.email || user.email;
       user.address = req.body.address || user.address;
       user.avatar = req.body.avatar || user.avatar;
-      user.birthday = req.body.birthday || user.birthday;
       user.phone = req.body.phone || user.phone;
       if (req.body.password) {
         user.password = bcrypt.hashSync(req.body.password);
@@ -143,10 +141,9 @@ userRoute.put(
         name: updatedUser.username,
         email: updatedUser.email,
         password: updatedUser.password,
-        birthday: updatedUser.birthday,
         address: updatedUser.address,
         phone: updatedUser.phone,
-        // token: generateToken(updatedUser), TODO:only use can edit password
+        token: generateToken(updatedUser),
       });
     } else {
       res.status(404).send({ message: "User not found" });
@@ -159,22 +156,12 @@ userRoute.put(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.body._id);
-    if (user && user.role!=='masteradmin') {
+    if (user && user.role !== "masteradmin") {
       user.isActive = req.body.isActive;
-      // if (req.body.password) {
-      //   user.password = bcrypt.hashSync(req.body.password, 8);
-      // } else {
-      //   user.password = user.password;
-      // }
+      user.role = req.body.role;
       const updatedUser = await user.save();
       res.send({
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        avatar: updatedUser.avatar,
-        birthday: updatedUser.birthday,
-        address: updatedUser.address,
-        phone: updatedUser.phone,
+        role: updatedUser.role,
         isActive: updatedUser.isActive,
         token: generateToken(updatedUser),
       });
